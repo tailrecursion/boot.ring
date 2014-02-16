@@ -1,36 +1,72 @@
 # boot.ring
 
-FIXME: description
+This project contains a number of tasks for the [boot][2] Clojure build tool
+that can be used to construct [Ring][4] servers for development.
 
-## Installation
+### Dependency
 
-Download from http://example.com/FIXME.
+Artifacts are published on Clojars.
 
-## Usage
+[![latest version][3]][1]
 
-FIXME: explanation
+### Tasks
 
-    $ java -jar boot.ring-0.1.0-standalone.jar [args]
+| Task           | Description                                                 |
+|----------------|-------------------------------------------------------------|
+| files          | Middleware to serve static files.                           |
+| head           | Middleware to handle HEAD requests.                         |
+| session-cookie | Middleware to manage client sessions via cookies.           |
+| dev-mode       | Middleware to add the "X-Dev-Mode" header to responses.     |
+| jetty          | Start a Jetty server with composition of middleware.        |
+| dev-server     | The "kitchen sink" task to start a dev server.              |
 
-## Options
+For more info about a task do `boot [help <task>]`.
 
-FIXME: listing of options this app accepts.
+### Usage
 
-## Examples
+```clojure
+#!/usr/bin/env boot
 
-...
+;; build.boot file
 
-### Bugs
+#tailrecursion.boot.core/version "..."
 
-...
+(set-env!
+  :project ...
+  :version ...
+  :dependencies [[tailrecursion/boot.ring "..."] ...]
+  ...)
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+(require '[tailrecursion.boot.task.ring :as r] ...)
+
+;; Ring tasks can be composed to create the server you desire:
+(deftask my-server
+  []
+  (comp (r/head) (r/dev-mode) (r/files) (r/jetty)))
+
+(defn wrap-foo [handler]
+  (fn [req]
+    ;; ...
+    (handle req)))
+
+;; You can create your own middleware task to insert your middleware:
+(deftask my-middleware
+  []
+  (r/ring-task wrap-foo))
+  
+;; And use your task, composing it with other ring tasks:
+(deftask my-other-server
+  []
+  (comp (head) (dev-mode) (my-middleware) (files) (jetty)))
+```
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2013 Alan Dipert and Micha Niskin
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License, the same as Clojure.
+
+[1]: https://clojars.org/tailrecursion/boot.ring
+[2]: https://github.com/tailrecursion/boot
+[3]: https://clojars.org/tailrecursion/boot.ring/latest-version.svg
+[4]: https://github.com/ring-clojure/ring

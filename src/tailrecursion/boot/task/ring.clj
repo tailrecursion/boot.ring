@@ -11,37 +11,36 @@
 (def server     (atom nil))
 (def middleware (atom identity))
 
+(defn ring-task [mw]
+  (swap! middleware comp mw)
+  identity)
+
 (defn handle-404
   [req]
   {:status 404 :headers {} :body "Not Found :("})
 
 (core/deftask files
   [& [docroot]]
-  (let [docroot (or docroot (core/get-env :out-path))
-        this-mw #(-> %
-                   (file/wrap-file docroot)
-                   (file-info/wrap-file-info))]
-    (swap! middleware comp this-mw)
-    identity))
+  (let [out (core/get-env :out-path)]
+    (ring-task #(-> %
+                  (file/wrap-file (or docroot out))
+                  (file-info/wrap-file-info)))))
 
 (core/deftask head
   []
-  (swap! middleware comp head/wrap-head)
-  identity)
+  (ring-task head/wrap-head))
 
 (core/deftask session-cookie
   [& [key]]
   (let [dfl-key "a 16-byte secret"
         store   (cookie/cookie-store {:key (or key dfl-key)})]
-    (swap! middleware comp #(session/wrap-session % {:store store}))
-    identity))
+    (ring-task #(session/wrap-session % {:store store}))))
 
 (core/deftask dev-mode
   []
   (let [set-dev #(assoc % "X-Dev-Mode" "true")
         add-hdr #(update-in % [:headers] set-dev)]
-    (swap! middleware comp #(comp add-hdr %))
-    identity))
+    (ring-task #(comp add-hdr %))))
 
 (core/deftask jetty
   [& {:keys [port join?] :or {port 8000 join? false}}]
