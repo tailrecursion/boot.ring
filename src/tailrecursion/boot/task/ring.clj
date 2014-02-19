@@ -1,5 +1,6 @@
 (ns tailrecursion.boot.task.ring
   (:require
+   [clojure.java.io                :as io]
    [tailrecursion.boot.core        :as core]
    [ring.adapter.jetty             :as jetty]
    [ring.middleware.session        :as session]
@@ -21,10 +22,9 @@
 
 (core/deftask files
   [& [docroot]]
-  (let [out (core/get-env :out-path)]
-    (ring-task #(-> %
-                  (file/wrap-file (or docroot out))
-                  (file-info/wrap-file-info)))))
+  (let [root (or docroot (core/get-env :out-path))]
+    (.mkdirs (io/file root))
+    (ring-task #(-> (file/wrap-file % root) (file-info/wrap-file-info)))))
 
 (core/deftask head
   []
