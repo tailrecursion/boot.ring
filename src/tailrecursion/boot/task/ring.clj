@@ -52,5 +52,10 @@
                (jetty/run-jetty {:port port :join? join?}))))))
 
 (core/deftask dev-server
-  []
-  (comp (head) (dev-mode) (session-cookie) (files) (jetty)))
+  [& {:keys [port join? key docroot]
+      :or {port    8000
+           join?   false
+           key     "a 16-byte secret"
+           docroot (core/get-env :out-path)}}]
+  (comp (head) (dev-mode) (session-cookie key) (files docroot)
+        (jetty :port port :join? join?)))
