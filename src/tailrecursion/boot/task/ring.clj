@@ -3,6 +3,7 @@
    [clojure.java.io                :as io]
    [tailrecursion.boot.core        :as core]
    [ring.adapter.jetty             :as jetty]
+   [ring.middleware.cors           :as cors]
    [ring.middleware.session        :as session]
    [ring.middleware.session.cookie :as cookie]
    [ring.middleware.reload         :as reload]
@@ -20,6 +21,15 @@
 (defn handle-404
   [req]
   {:status 404 :headers {} :body "Not Found :("})
+
+(core/deftask cors
+  "Ring task to support cross-origin requests.
+
+  allowed-origins is a list of regular expressions matching the permitted 
+  origin(s) or a single function which takes the origin as its argument 
+  to return a truthy value if it is to be allowed."
+  [& allowed-origins]
+  (ring-task #(apply cors/wrap-cors % allowed-origins)))
 
 (core/deftask files
   "Ring task to serve static files.

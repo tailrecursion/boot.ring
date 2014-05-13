@@ -13,12 +13,13 @@ Artifacts are published on Clojars.
 
 | Task           | Description                                                 |
 |----------------|-------------------------------------------------------------|
+| cors           | Middleware to handle cross-origin requests.                 |
 | files          | Middleware to serve static files.                           |
 | head           | Middleware to handle HEAD requests.                         |
 | session-cookie | Middleware to manage client sessions via cookies.           |
 | dev-mode       | Middleware to add the "X-Dev-Mode" header to responses.     |
 | jetty          | Start a Jetty server with composition of middleware.        |
-| reload         | Automatically reload namespaces during development.
+| reload         | Automatically reload namespaces during development.         |
 | dev-server     | The "kitchen sink" task to start a dev server.              |
 
 For more info about a task do `boot [help <task>]`.
@@ -69,5 +70,5 @@ Distributed under the Eclipse Public License, the same as Clojure.
 
 [1]: https://clojars.org/tailrecursion/boot.ring
 [2]: https://github.com/tailrecursion/boot
-[3]: https://clojars.org/tailrecursion/boot.ring/latest-version.svg?cachebust=1
+[3]: https://clojars.org/tailrecursion/boot.ring/latest-version.svg?cachebust=2
 [4]: https://github.com/ring-clojure/ring
